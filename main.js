@@ -29,3 +29,85 @@
         }
    })();
 </script>
+
+<?
+//Index.php
+session_start();
+if (!empty($_GET['user_id']) && !empty($_GET['access_token'])  ) {
+  $_SESSION['user_id'] = $_GET['user_id'];
+  $_SESSION['access_token'] = $_GET['access_token'];
+  header('Location: index.php');
+  // print_r($_SESSION);
+  die();
+}
+if ( empty($_SESSION['user_id']) ) {
+  header('Location: enter.php');
+  // print_r($_SESSION);
+  die();
+}
+
+require 'php/vkapi.class.php';
+
+$post_url = 'https://api.vk.com/method/groups.getMembers ';
+$queryArray = array('group_id' => '19072119', 'fields' => 'photo_50');
+
+$res = Send_Post($post_url, $queryArray,'http://paysys.sovbank.ru/vk/index.php');
+
+
+// enter.php
+session_start();
+if (empty($_GET['access_token']) ||  empty($_SESSIOM['vkid'])) {
+  header("Location: https://oauth.vk.com/authorize?"
+       . "client_id=4772837&"
+       . "scope=groups&"
+       . "redirect_uri=http://paysys.sovbank.ru/Wiki/TFE/app/entered.php?&"
+       . "display=page&"
+       . "v=5.28&"
+       . "response_type=token");  
+  die();
+}
+
+// entered.php
+?>
+
+<?
+session_start();
+?>
+<!DOCTYPE html>
+<html lang="en" > 
+<head>
+  <meta charset="utf-8">
+  <title>My AngularJS App</title>
+</head>
+<body>
+<p>Авторизация успешно пройдкна</p>
+<p id="enter"></p><?
+
+//<a href="index.php">Main</a>
+// print_r($_HEADER);
+// echo '<hr>';
+// $url = "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+// echo $url.'<hr>';
+// $parts = parse_url($url);
+// echo '<hr>';
+// parse_str($parts['query'], $query);
+// print_r( $query);
+?>
+</body>
+<script type="text/javascript">
+  var href = location.href;
+  var queryStringStart = href.indexOf( '#' );
+  var queryString = href.substring(queryStringStart+1);
+
+
+  var enter = document.getElementById('enter');
+  console.log(enter)
+  var link = document.createElement("a");
+  console.log(link)
+  link.setAttribute("href", "index.php?"+queryString);
+  link.innerHTML ='home';
+  console.log(link)
+  enter.appendChild(link)
+  console.log(enter)
+</script>
+</html>
