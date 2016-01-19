@@ -9,7 +9,7 @@
         for (var k in l = ['A','B','C', 'D', 'E', 'F','G','H']) {
             var b = document.createElement('span');
             b.id = l[k]+i;
-            b.setAttribute('style', 'width:20px;height:20px;display:inline-block;background-color:#' + ( bg == 'FFF' ? (bg = 'CCC') : (bg = 'FFF')));
+            b.setAttribute('style', 'width:20px;height:20px;vertical-align:bottom;inline-height:20px;display:inline-block;background-color:#' + ( bg == 'FFF' ? (bg = 'CCC') : (bg = 'FFF')));
             b.onclick = function(){
                      if (document.getElementsByClassName('active').length > 0) {
                          a[this.id] = a[document.getElementsByClassName('active')[0].id];
