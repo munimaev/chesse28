@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title></title>
+</head>
+<script>
+
+function isOneOfSymbols(simbol, simbols) {
+  for (var i in simbols) {
+    if (simbols[i] === simbol) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function priority(simbol) {
+  var arr = [
+    ['(',')'],
+    ['+','-'],
+    ['*','/'],
+    ['^'],
+  ];
+  for (var level in arr) {
+    for (var operation in arr[level]) {
+      if (arr[level][operation] == simbol) {
+        return level;
+      }
+    }
+  }
+  console.log('Error: unknown simbol ' + simbol);
+}
+function constantToValue(simbol) {
+  switch (simbol) {
+    case 'PI':
+      return '3.14159265359';
+      break;
+    case 'E':
+      return '2,71828182845';
+      break;
+  }
+  return simbol;
+}
+
+var input =  "3 + 4 * 2 / (1 - 5)^2";
+var input =  "11 + (exp(2.010635 + sin(PI/2)*3) + 50) / 2";
+var len = input.length;
+var prepare = [];
+var output = [];
+var stack = [];
+
+var puzzle = null;
+var current = '';
+
+//prepare
+for (var i = 0; i < len ; i++ ) {
+  if (input[i] === ' ') {
+    if (current !== '') {
+      prepare.push(constantToValue(current));
+    } 
+    current = '';
+  }
+  if (isOneOfSymbols(input[i], ['0','1','2','3','4','5','6','7','8','9','.',','])) {
+    if (input[i] === ',') {
+      current += '.';
+    } else {
+      current += input[i];
+    }
+  }
+  if (isOneOfSymbols(input[i], ['s','i','n','c','o','e','x','p','P','I','E'])) {
+      current += input[i];
+  }
+  if (isOneOfSymbols(input[i], ['+','-','/','*','^','(',')'])) { 
+    if (current !== '') {
+    console.log(current)
+      prepare.push(constantToValue(current));
+    console.log(prepare)
+    } 
+    prepare.push(input[i]);
+    current = '';
+  }
+
+}
+if (current !== '') {
+  prepare.push(constantToValue(current));
+} 
+console.log(prepare)
+// end prepare
+
+// output
+for (var i in prepare) {
+  console.log('---------')
+  console.log(prepare[i])
+
+  if (!isNaN(parseFloat(prepare[i]))) {
+    output.push(prepare[i]);
+  }
+  else if(isOneOfSymbols(prepare[i], ['sin','exp', 'PI'])) {
+    stack.push(prepare[i])
+  }
+  else if(isOneOfSymbols(prepare[i], ['('])) {
+    stack.push(prepare[i])
+  }
+  else if(isOneOfSymbols(prepare[i], [')'])) {
+    
+    while (stack[stack.length - 1] !== '(') {
+      output.push(stack.splice(stack.length - 1)[0]);
+    }
+    if (!stack.length || stack[stack.length - 1] !== '(') {
+      alert('()');
+    }
+    else {
+      stack.splice(stack.length - 1);
+      if (isOneOfSymbols(stack[stack.length - 1], ['sin','exp'])) {
+          output.push(stack.splice(stack.length - 1)[0]);
+      }
+    }
+  }
+  // + - * /  left
+  else if (isOneOfSymbols(prepare[i], ['+','-','/','*'])) {
+
+
+    while (stack.length && priority(prepare[i]) <= priority(stack[stack.length - 1]) ) {
+      console.log('!')
+      output.push(stack.splice(stack.length - 1, 1)[0]);
+    }
+    stack.push(prepare[i]);
+  }
+  // ^        right
+  else if (isOneOfSymbols(prepare[i], ['^'])) {
+
+    while (stack.length && priority(prepare[i]) < priority(stack[stack.length - 1])) {
+      output.push(stack.splice(stack.length - 1, 1)[0]);
+    }
+    stack.push(prepare[i]);
+  }
+
+
+  console.log(output) 
+  console.log(stack)
+}
+while (stack.length) {
+  if (stack[stack.length - 1] == '(' || stack[stack.length - 1] == ')') {
+    console.log('Error: ()')
+  }
+  output.push(stack.splice(stack.length - 1, 1)[0])
+}
+// end output
+ console.log('=======')
+  console.log(output) 
+  console.log(stack)
+
+//calc
+stack = [];
+for (var i in output) {
+  if (!isNaN(parseFloat(output[i]))) {
+    stack.push(parseFloat(output[i]));
+  }
+  else {
+    var sLen = stack.length - 1;
+    switch (output[i]) {
+      case '+' :
+        stack.splice(sLen - 1, 2, stack[sLen-1] + stack[sLen])
+        break;
+      case '-' :
+        stack.splice(sLen - 1, 2, stack[sLen-1] - stack[sLen])
+        break;
+      case '*' :
+        stack.splice(sLen - 1, 2, stack[sLen-1] * stack[sLen])
+        break;
+      case '/' :
+        stack.splice(sLen - 1, 2, stack[sLen-1] / stack[sLen])
+        break;
+      case '^' :
+        stack.splice(sLen - 1, 2, Math.pow(stack[sLen],stack[sLen-1]))
+        break;
+      case 'sin' :
+        stack.splice(sLen, 1, Math.sin(stack[sLen]))
+        break;
+      case 'exp' :
+        stack.splice(sLen, 1, Math.exp(stack[sLen]))
+        break;
+      default:
+        console.log('Error unknown operator '+output[i])
+    }
+  }
+
+  console.log(stack)
+}
+  console.log('stack', stack)
+//ens calc
+</script>
+
+<body>
+
+</body>
+</html>
